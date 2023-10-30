@@ -1,0 +1,32 @@
+services:
+
+  # Needed infrastructure
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=task
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - task-network
+
+networks:
+  task-network:
+    driver: bridge
+
+volumes:
+  postgres-data: {}

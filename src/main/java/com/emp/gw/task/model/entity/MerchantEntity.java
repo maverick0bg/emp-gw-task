@@ -1,27 +1,35 @@
 package com.emp.gw.task.model.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import java.math.BigDecimal;
-
 @Getter
 @Setter
+@Builder
 @EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "merchants")
 public class MerchantEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id", nullable = false)
+  @SequenceGenerator(
+      name = "merchant_generator",
+      sequenceName = "merchants_seq",
+      allocationSize = 1)
+  @GeneratedValue(generator = "merchant_generator", strategy = GenerationType.SEQUENCE)
   @JdbcTypeCode(SqlTypes.BIGINT)
   private Long id;
 

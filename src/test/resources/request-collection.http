@@ -1,1 +1,41 @@
-http://localhost:8080/actuator/health
+GET http://localhost:8080/actuator/health
+
+
+###
+# @name Create Merchant
+POST http://localhost:8080/merchant
+Content-Type: application/json
+Authorization: Basic user 95d78972-bfcd-490d-9fe8-35aeeb8cf7da
+
+{
+  "merchantName": "Merchant A",
+  "email": "memail@a.com",
+  "description": "Merchant A Description"
+}
+
+###
+# @name Create Merchant full
+POST http://localhost:8080/merchant
+Content-Type: application/json
+Authorization: Basic user 95d78972-bfcd-490d-9fe8-35aeeb8cf7da
+
+{
+  "id": 44,
+  "merchantName": "Merchant D",
+  "description": "Merchant D Description",
+  "email": "mdemail@a.com",
+  "active": false,
+  "totalTransactionAmount": 0.0
+}
+
+###
+# @name Activate Merchant
+PATCH http://localhost:8080/merchant/2
+Content-Type: application/json
+
+{ "ACTIVE": true }
+
+###
+# @name Activate Merchant
+GET http://localhost:8080/merchant/2
+Content-Type: application/json

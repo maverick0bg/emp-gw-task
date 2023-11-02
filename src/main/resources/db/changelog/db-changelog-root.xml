@@ -9,4 +9,6 @@
             author="maverick02bg"/>
     <include file="db/changelog/2023/2023-02-create-merchant-sequence.xml" id="2"
             author="maverick02bg"/>
+    <include file="db/changelog/2023/2023-03-create-transaction.xml" id="3"
+            author="maverick02bg"/>
 </databaseChangeLog>

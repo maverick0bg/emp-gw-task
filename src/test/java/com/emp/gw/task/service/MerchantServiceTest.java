@@ -18,6 +18,8 @@ import com.emp.gw.task.repository.MerchantRepository;
 import com.emp.gw.task.service.impl.MerchantServiceImpl;
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Optional;
+
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -94,7 +96,7 @@ class MerchantServiceTest {
             .totalTransactionAmount(BigDecimal.valueOf(0))
             .description("desc")
             .build();
-    when(merchantRepository.findById(1L)).thenReturn(java.util.Optional.of(foundMerchant));
+    when(merchantRepository.findById(1L)).thenReturn(Optional.of(foundMerchant));
     final MerchantDto expectedMerchant =
         MerchantDto.builder()
             .id(foundMerchant.getId())
@@ -111,7 +113,7 @@ class MerchantServiceTest {
 
   @Test
   void getMerchant_will_throwNotFound() {
-    when(merchantRepository.findById(1L)).thenReturn(java.util.Optional.empty());
+    when(merchantRepository.findById(1L)).thenReturn(Optional.empty());
     Assert.assertThrows(NotFoundException.class, () -> merchantService.getMerchant(1L));
   }
 
@@ -126,7 +128,7 @@ class MerchantServiceTest {
             .totalTransactionAmount(BigDecimal.valueOf(0))
             .description("desc")
             .build();
-    when(merchantRepository.findById(10L)).thenReturn(java.util.Optional.of(foundEntity));
+    when(merchantRepository.findById(10L)).thenReturn(Optional.of(foundEntity));
     Map<MerchantUpdatableFields, Object> updateRequestDto =
         Map.of(MerchantUpdatableFields.ACTIVE, Boolean.valueOf(true));
     final MerchantEntity updatedEntity =
@@ -156,7 +158,7 @@ class MerchantServiceTest {
 
   @Test
   void updateMerchant_trowsNotFound() {
-    when(merchantRepository.findById(11L)).thenReturn(java.util.Optional.empty());
+    when(merchantRepository.findById(11L)).thenReturn(Optional.empty());
     Assert.assertThrows(NotFoundException.class, () -> merchantService.getMerchant(11L));
   }
 }

@@ -2,7 +2,6 @@ package com.emp.gw.task.service;
 
 import com.emp.gw.task.dto.MerchantDto;
 import com.emp.gw.task.enums.MerchantUpdatableFields;
-
 import java.util.Map;
 
 public interface MerchantService {

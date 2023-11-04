@@ -42,6 +42,18 @@ public class MerchantServiceImpl implements MerchantService {
   }
 
   @Override
+  public MerchantDto getActiveMerchant(Long merchantId) {
+
+    final MerchantEntity merchantEntity =
+        merchantRepository
+            .findByIdAndActiveTrue(merchantId)
+            .orElseThrow(
+                () ->
+                    new NotFoundException("Active merchant with id " + merchantId + " not found"));
+    return merchantMapper.toDto(merchantEntity);
+  }
+
+  @Override
   public MerchantDto updateMerchant(Long merchantId, Map<MerchantUpdatableFields, Object> fields) {
     MerchantEntity merchantEntity =
         merchantRepository

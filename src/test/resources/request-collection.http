@@ -39,3 +39,20 @@ Content-Type: application/json
 # @name Activate Merchant
 GET http://localhost:8080/merchant/2
 Content-Type: application/json
+
+###
+# @name Create Authorize tranzaction
+POST http://localhost:8080/transaction
+Content-Type: application/json
+
+{
+  "amount": 100.34,
+  "customerEmail": "eml@e.com",
+  "customerPhone": "1234567890",
+  "merchant": {
+    "id": 1
+  },
+  "transactionStatus": "APPROVED",
+  "transactionType": "AUTHORISE"
+}
+

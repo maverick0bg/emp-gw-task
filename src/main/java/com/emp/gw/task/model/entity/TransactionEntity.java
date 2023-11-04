@@ -16,8 +16,11 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import java.math.BigDecimal;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -26,6 +29,9 @@ import org.hibernate.annotations.UuidGenerator;
 @Getter
 @Setter
 @EqualsAndHashCode
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TransactionEntity {
 
   @UuidGenerator @Id private UUID id;

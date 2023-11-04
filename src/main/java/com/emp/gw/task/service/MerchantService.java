@@ -10,5 +10,7 @@ public interface MerchantService {
 
   MerchantDto getMerchant(Long merchantId);
 
+  MerchantDto getActiveMerchant(Long merchantId);
+
   MerchantDto updateMerchant(Long merchantId, Map<MerchantUpdatableFields, Object> fields);
 }

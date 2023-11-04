@@ -1,8 +1,7 @@
-package com.emp.gw.task.service;
+package com.emp.gw.task.service.impl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -15,7 +14,8 @@ import com.emp.gw.task.exception.NotFoundException;
 import com.emp.gw.task.mapper.MerchantMapper;
 import com.emp.gw.task.model.entity.MerchantEntity;
 import com.emp.gw.task.repository.MerchantRepository;
-import com.emp.gw.task.service.impl.MerchantServiceImpl;
+import com.emp.gw.task.service.MerchantService;
+
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
@@ -28,7 +28,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MerchantServiceTest {
+class MerchantServiceImplTest {
 
   private MerchantService merchantService;
   @Mock MerchantRepository merchantRepository;
@@ -161,4 +161,37 @@ class MerchantServiceTest {
     when(merchantRepository.findById(11L)).thenReturn(Optional.empty());
     Assert.assertThrows(NotFoundException.class, () -> merchantService.getMerchant(11L));
   }
+
+  @Test
+  void getActiveMerchant_will_success() {
+    final MerchantEntity foundMerchant =
+        MerchantEntity.builder()
+            .id(1L)
+            .active(true)
+            .email("f@a.com")
+            .merchantName("f")
+            .totalTransactionAmount(BigDecimal.valueOf(0))
+            .description("desc")
+            .build();
+    when(merchantRepository.findByIdAndActiveTrue(1L)).thenReturn(Optional.of(foundMerchant));
+    final MerchantDto expectedMerchant =
+        MerchantDto.builder()
+            .id(foundMerchant.getId())
+            .email(foundMerchant.getEmail())
+            .merchantName(foundMerchant.getMerchantName())
+            .active(foundMerchant.isActive())
+            .totalTransactionAmount(foundMerchant.getTotalTransactionAmount().doubleValue())
+            .description(foundMerchant.getDescription())
+            .build();
+    when(merchantMapper.toDto(foundMerchant)).thenReturn(expectedMerchant);
+    MerchantDto result = merchantService.getActiveMerchant(1L);
+    assertThat(result, is(expectedMerchant));
+  }
+
+  @Test
+  void getActiveMerchant_will_throwNotFound() {
+    when(merchantRepository.findByIdAndActiveTrue(1L)).thenReturn(Optional.empty());
+    Assert.assertThrows(NotFoundException.class, () -> merchantService.getMerchant(1L));
+  }
+
 }

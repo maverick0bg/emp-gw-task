@@ -20,14 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/merchant", produces = "application/json", consumes = "application/json")
 @RequiredArgsConstructor
-@Validated
 public class MerchantController {
 
   private final MerchantService merchantService;
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public MerchantDto createMerchant(@RequestBody @NotNull MerchantDto body) {
+  public MerchantDto createMerchant(@RequestBody @NotNull @Validated MerchantDto body) {
     return merchantService.createMerchant(body);
   }
 

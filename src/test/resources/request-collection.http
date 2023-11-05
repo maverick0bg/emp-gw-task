@@ -1,11 +1,13 @@
 GET http://localhost:8080/actuator/health
+Authorization: Basic merchant changeit
 
 
 ###
 # @name Create Merchant
 POST http://localhost:8080/merchant
 Content-Type: application/json
-Authorization: Basic user 95d78972-bfcd-490d-9fe8-35aeeb8cf7da
+Authorization: Basic merchant changeit
+X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
 
 {
   "merchantName": "Merchant A",
@@ -17,7 +19,8 @@ Authorization: Basic user 95d78972-bfcd-490d-9fe8-35aeeb8cf7da
 # @name Create Merchant full
 POST http://localhost:8080/merchant
 Content-Type: application/json
-Authorization: Basic user 95d78972-bfcd-490d-9fe8-35aeeb8cf7da
+Authorization: Basic merchant changeit
+X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
 
 {
   "id": 44,
@@ -32,18 +35,24 @@ Authorization: Basic user 95d78972-bfcd-490d-9fe8-35aeeb8cf7da
 # @name Activate Merchant
 PATCH http://localhost:8080/merchant/2
 Content-Type: application/json
+Authorization: Basic merchant changeit
+X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
 
 { "ACTIVE": true }
 
 ###
-# @name Activate Merchant
+# @name Get merchant
 GET http://localhost:8080/merchant/2
 Content-Type: application/json
+Authorization: Basic merchant changeit
+
 
 ###
 # @name Create Authorize tranzaction
 POST http://localhost:8080/transaction
 Content-Type: application/json
+Authorization: Basic merchant changeit
+X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
 
 {
   "amount": 100.34,

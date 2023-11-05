@@ -1,0 +1,3 @@
+id,username,password,authority
+nextval('users_seq'),admin,{noop}changeit,admin
+nextval('users_seq'),merchant,{noop}changeit,merchant

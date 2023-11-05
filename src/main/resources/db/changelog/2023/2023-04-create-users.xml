@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="4" author="maverick02bg">
+        <createSequence sequenceName="users_seq" startValue="101" incrementBy="1"/>
+        <createTable tableName="users">
+            <column name="id" type="bigint">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_users"/>
+            </column>
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authority" type="VARCHAR(255)"/>
+            <column name="credentials_non_expired" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <loadData tableName="users" file="/db/changelog/2023/2023-04-users-data.csv" separator=","
+                encoding="UTF-8">
+        </loadData>
+        <addColumn tableName="merchants">
+            <column name="user_id" type="bigint">
+                <constraints foreignKeyName="fk_merchants_users" referencedTableName="users"
+                        referencedColumnNames="id"/>
+            </column>
+        </addColumn>
+        <update tableName="merchants">
+            <column name="user_id" valueNumeric="102"/>
+            <where>id = 1</where>
+        </update>
+
+        <dropForeignKeyConstraint baseTableName="transactions"
+                constraintName="fk_transactions_merchants"/>
+        <dropPrimaryKey tableName="merchants" constraintName="pk_merchants"/>
+        <renameColumn tableName="merchants" oldColumnName="id" newColumnName="old_id"/>
+
+        <addColumn tableName="merchants">
+            <column name="id" type="bigint">
+            </column>
+        </addColumn>
+
+
+        <update tableName="merchants">
+            <column name="id" valueComputed="old_id"/>
+            <where>1=1</where>
+        </update>
+
+        <addNotNullConstraint tableName="merchants" columnName="id"/>
+        <addPrimaryKey tableName="merchants" columnNames="id"></addPrimaryKey>
+        <dropColumn tableName="merchants" columnName="old_id"/>
+        <addForeignKeyConstraint baseTableName="transactions" baseColumnNames="merchant_id"
+                constraintName="fk_transactions_merchants" referencedTableName="merchants"
+                referencedColumnNames="id"/>
+
+    </changeSet>
+</databaseChangeLog>

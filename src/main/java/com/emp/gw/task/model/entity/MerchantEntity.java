@@ -40,4 +40,5 @@ public class MerchantEntity implements Serializable {
   private String email;
   private boolean active;
   private BigDecimal totalTransactionAmount;
+  private Long userId;
 }

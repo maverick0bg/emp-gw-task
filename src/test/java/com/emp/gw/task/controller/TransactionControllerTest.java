@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.emp.gw.task.TaskApplication;
 import com.emp.gw.task.dto.MerchantDto;
 import com.emp.gw.task.dto.TransactionDto;
 import com.emp.gw.task.enums.TransactionStatuses;
@@ -14,9 +15,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -26,6 +31,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Testcontainers
+@WebAppConfiguration
+@ContextConfiguration(classes = {TaskApplication.class})
 class TransactionControllerTest {
 
   @Container
@@ -46,6 +53,7 @@ class TransactionControllerTest {
   ObjectMapper objectMapper = new ObjectMapper();
 
   @Test
+  @WithMockUser(username = "admin", password = "admin", roles = "admin")
   void createTransaction() throws Exception {
     TransactionDto transaction =
         TransactionDto.builder()
@@ -59,6 +67,8 @@ class TransactionControllerTest {
     mockMvc
         .perform(
             post("/transaction")
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .content(objectMapper.writeValueAsString(transaction))
                 .contentType("application/json"))
         .andExpect(status().isOk())

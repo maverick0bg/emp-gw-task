@@ -3,23 +3,26 @@ package com.emp.gw.task.controller;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.emp.gw.task.TaskApplication;
 import com.emp.gw.task.dto.MerchantDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -30,6 +33,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Testcontainers
+@WebAppConfiguration
+@ContextConfiguration(classes = {TaskApplication.class})
 class MerchantControllerTest {
 
   @Container
@@ -47,9 +52,11 @@ class MerchantControllerTest {
   }
 
   @Autowired MockMvc mockMvc;
-  ObjectMapper objectMapper = new ObjectMapper();
 
+  ObjectMapper objectMapper = new ObjectMapper();
+  
   @Test
+  @WithMockUser(username = "admin", password = "admin", roles = "admin")
   void createMerchant() throws Exception {
     final MerchantDto merchantRequest =
         MerchantDto.builder()
@@ -60,6 +67,8 @@ class MerchantControllerTest {
     mockMvc
         .perform(
             post("/merchant")
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .content(objectMapper.writeValueAsString(merchantRequest))
                 .contentType("application/json"))
         .andExpect(status().isCreated())
@@ -71,6 +80,7 @@ class MerchantControllerTest {
   }
 
   @Test
+  @WithMockUser(username = "admin", password = "admin", roles = "ADMIN")
   void getMerchant() throws Exception {
     final MerchantDto merchantRequest =
         MerchantDto.builder()
@@ -82,6 +92,8 @@ class MerchantControllerTest {
         mockMvc
             .perform(
                 post("/merchant")
+                    .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
+                    .with(SecurityMockMvcRequestPostProcessors.csrf())
                     .content(objectMapper.writeValueAsString(merchantRequest))
                     .contentType("application/json"))
             .andExpect(status().isCreated())
@@ -90,7 +102,11 @@ class MerchantControllerTest {
         objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MerchantDto.class);
     mvcResult =
         mockMvc
-            .perform(get("/merchant/" + resultMerchant.getId()).contentType("application/json"))
+            .perform(
+                get("/merchant/" + resultMerchant.getId())
+                    .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
+                    .with(SecurityMockMvcRequestPostProcessors.csrf())
+                    .contentType("application/json"))
             .andExpect(status().isOk())
             .andReturn();
 
@@ -100,6 +116,7 @@ class MerchantControllerTest {
   }
 
   @Test
+  @WithMockUser(username = "admin", password = "admin", roles = "admin")
   void updateMerchant() throws Exception {
     final MerchantDto merchantRequest =
         MerchantDto.builder()
@@ -111,6 +128,8 @@ class MerchantControllerTest {
         mockMvc
             .perform(
                 post("/merchant")
+                    .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
+                    .with(SecurityMockMvcRequestPostProcessors.csrf())
                     .content(objectMapper.writeValueAsString(merchantRequest))
                     .contentType("application/json"))
             .andExpect(status().isCreated())
@@ -125,6 +144,8 @@ class MerchantControllerTest {
     mockMvc
         .perform(
             patch("/merchant/" + resultMerchant.getId())
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .content(
                     String.format(
                         """

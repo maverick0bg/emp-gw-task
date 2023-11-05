@@ -11,4 +11,6 @@
             author="maverick02bg"/>
     <include file="db/changelog/2023/2023-03-create-transaction.xml" id="3"
             author="maverick02bg"/>
+    <include file="db/changelog/2023/2023-04-create-users.xml" id="4"
+            author="maverick02bg"/>
 </databaseChangeLog>

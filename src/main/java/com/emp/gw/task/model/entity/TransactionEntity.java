@@ -28,11 +28,11 @@ import org.hibernate.annotations.UuidGenerator;
 @Entity(name = "transactions")
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionEntity {
+public class TransactionEntity extends AuditableEntity {
 
   @UuidGenerator @Id private UUID id;
 

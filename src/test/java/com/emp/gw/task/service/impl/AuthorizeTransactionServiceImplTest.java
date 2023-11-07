@@ -17,6 +17,7 @@ import com.emp.gw.task.mapper.TransactionEntityMapper;
 import com.emp.gw.task.model.entity.TransactionEntity;
 import com.emp.gw.task.repository.TransactionRepository;
 import com.emp.gw.task.service.MerchantService;
+import com.emp.gw.task.service.TransactionService;
 import java.math.BigDecimal;
 import java.util.UUID;
 import org.junit.Assert;
@@ -35,14 +36,14 @@ class AuthorizeTransactionServiceImplTest {
   @Mock private TransactionRepository transactionRepository;
   @Mock private MerchantService merchantService;
 
-  AuthorizeTransactionServiceImpl authorizeTransactionService;
+  TransactionService transactionService;
   private TransactionEntityMapper mapper;
 
   @BeforeAll
   void setUp() {
     MockitoAnnotations.openMocks(this);
     mapper = Mappers.getMapper(TransactionEntityMapper.class);
-    authorizeTransactionService =
+    transactionService =
         new AuthorizeTransactionServiceImpl(transactionRepository, mapper, merchantService);
   }
 
@@ -58,7 +59,7 @@ class AuthorizeTransactionServiceImplTest {
                 .transactionType(AUTHORISE)
                 .build());
     TransactionResponseDto transactionResult =
-        authorizeTransactionService.createTransaction(
+        transactionService.createTransaction(
             TransactionDto.builder()
                 .transactionType(AUTHORISE)
                 .transactionStatus(APPROVED)
@@ -82,7 +83,7 @@ class AuthorizeTransactionServiceImplTest {
             .build();
     Assert.assertThrows(
         NotFoundException.class,
-        () -> authorizeTransactionService.createTransaction(transactionDto));
+        () -> transactionService.createTransaction(transactionDto));
   }
 
   @Test
@@ -106,11 +107,11 @@ class AuthorizeTransactionServiceImplTest {
             .build();
     Assert.assertThrows(
         InvalidInputException.class,
-        () -> authorizeTransactionService.createTransaction(transactionDto));
+        () -> transactionService.createTransaction(transactionDto));
     transactionDto.setAmount(BigDecimal.ZERO);
     transactionDto.setRelatedTransaction(null);
     Assert.assertThrows(
         InvalidInputException.class,
-        () -> authorizeTransactionService.createTransaction(transactionDto));
+        () -> transactionService.createTransaction(transactionDto));
   }
 }

@@ -8,6 +8,7 @@ import com.emp.gw.task.mapper.MerchantMapper;
 import com.emp.gw.task.model.entity.MerchantEntity;
 import com.emp.gw.task.repository.MerchantRepository;
 import com.emp.gw.task.service.MerchantService;
+import java.math.BigDecimal;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.PropertyAccessorFactory;
@@ -32,12 +33,9 @@ public class MerchantServiceImpl implements MerchantService {
   }
 
   @Override
-  public MerchantDto getMerchant(Long merchantId) {
+  public MerchantDto findMerchant(Long merchantId) {
 
-    final MerchantEntity merchantEntity =
-        merchantRepository
-            .findById(merchantId)
-            .orElseThrow(() -> new NotFoundException("Merchant not found"));
+    final MerchantEntity merchantEntity = findMerchantEntity(merchantId);
     return merchantMapper.toDto(merchantEntity);
   }
 
@@ -49,21 +47,32 @@ public class MerchantServiceImpl implements MerchantService {
             .findByIdAndActiveTrue(merchantId)
             .orElseThrow(
                 () ->
-                    new NotFoundException("Active merchant with id " + merchantId + " not found"));
+                    new NotFoundException(
+                        "Merchant with id " + merchantId + " does not exists or is not active!"));
     return merchantMapper.toDto(merchantEntity);
   }
 
   @Override
   public MerchantDto updateMerchant(Long merchantId, Map<MerchantUpdatableFields, Object> fields) {
-    MerchantEntity merchantEntity =
-        merchantRepository
-            .findById(merchantId)
-            .orElseThrow(() -> new NotFoundException("Merchant not found"));
+    MerchantEntity merchantEntity = findMerchantEntity(merchantId);
     fields.forEach(
         (key, value) ->
             PropertyAccessorFactory.forBeanPropertyAccess(merchantEntity)
                 .setPropertyValue(key.getFieldName(), value));
     MerchantEntity savedMerchantEntity = merchantRepository.save(merchantEntity);
     return merchantMapper.toDto(savedMerchantEntity);
+  }
+
+  @Override
+  public void addAmountToMerchantBalance(Long id, BigDecimal amount) {
+    MerchantEntity merchant = findMerchantEntity(id);
+    merchant.setTotalTransactionAmount(merchant.getTotalTransactionAmount().add(amount));
+    merchantRepository.save(merchant);
+  }
+
+  private MerchantEntity findMerchantEntity(Long id) {
+    return merchantRepository
+        .findById(id)
+        .orElseThrow(() -> new NotFoundException("Merchant not found"));
   }
 }

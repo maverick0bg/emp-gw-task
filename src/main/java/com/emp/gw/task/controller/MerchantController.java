@@ -33,7 +33,7 @@ public class MerchantController {
   @GetMapping("/{merchantId}")
   @ResponseStatus(HttpStatus.OK)
   public MerchantDto getMerchant(@PathVariable("merchantId") @NotNull Long merchantId) {
-    return merchantService.getMerchant(merchantId);
+    return merchantService.findMerchant(merchantId);
   }
 
   @PatchMapping("/{merchantId}")

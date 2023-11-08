@@ -26,14 +26,14 @@ X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
   "id": 44,
   "merchantName": "Merchant D",
   "description": "Merchant D Description",
-  "email": "mdemail@a.com",
+  "email": "mdemel@a.com",
   "active": false,
   "totalTransactionAmount": 0.0
 }
 
 ###
 # @name Activate Merchant
-PATCH http://localhost:8080/merchant/2
+PATCH http://localhost:8080/merchant/4
 Content-Type: application/json
 Authorization: Basic merchant changeit
 X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
@@ -42,9 +42,17 @@ X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
 
 ###
 # @name Get merchant
-GET http://localhost:8080/merchant/2
+GET http://localhost:8080/merchant/4
 Content-Type: application/json
 Authorization: Basic merchant changeit
+X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
+
+###
+# @name Delete merchant
+DELETE http://localhost:8080/merchant/3
+Content-Type: application/json
+Authorization: Basic merchant changeit
+X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
 
 
 ###
@@ -59,7 +67,7 @@ X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
   "customerEmail": "eml@e.com",
   "customerPhone": "1234567890",
   "merchant": {
-    "id": 1
+    "id": 3
   },
   "transactionStatus": "APPROVED",
   "transactionType": "AUTHORISE"

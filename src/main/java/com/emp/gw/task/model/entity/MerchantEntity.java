@@ -1,12 +1,15 @@
 package com.emp.gw.task.model.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -41,4 +44,6 @@ public class MerchantEntity implements Serializable {
   private boolean active;
   private BigDecimal totalTransactionAmount;
   private Long userId;
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "merchant")
+  private List<TransactionEntity> transactions;
 }

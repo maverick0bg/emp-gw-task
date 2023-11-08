@@ -22,7 +22,7 @@ public class TransactionCleanupServiceImpl implements TransactionsCleanupService
   private final TransactionRepository transactionRepository;
 
   @Override
-  @Scheduled(cron = "10 1 1 * * *")
+  @Scheduled(cron = "21 21 * * * *")
   @SchedulerLock(name = "cleanUpTransactions", lockAtMostFor = "PT10M")
   @Transactional(TxType.REQUIRES_NEW)
   public void cleanUpTransactions() {

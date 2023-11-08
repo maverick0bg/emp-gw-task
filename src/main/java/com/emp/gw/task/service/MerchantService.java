@@ -16,4 +16,6 @@ public interface MerchantService {
   MerchantDto updateMerchant(Long merchantId, Map<MerchantUpdatableFields, Object> fields);
 
   void addAmountToMerchantBalance(Long id, BigDecimal amount);
+
+  void deleteMerchant(Long merchantId);
 }

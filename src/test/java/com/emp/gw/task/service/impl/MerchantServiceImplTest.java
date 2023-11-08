@@ -14,12 +14,16 @@ import com.emp.gw.task.exception.ConflictException;
 import com.emp.gw.task.exception.NotFoundException;
 import com.emp.gw.task.mapper.MerchantMapper;
 import com.emp.gw.task.model.entity.MerchantEntity;
+import com.emp.gw.task.model.entity.TransactionEntity;
 import com.emp.gw.task.repository.MerchantRepository;
 import com.emp.gw.task.service.MerchantService;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -217,4 +221,41 @@ class MerchantServiceImplTest {
     verify(merchantRepository, times(1)).save(merchantEntityArgumentCaptor.capture());
     assertThat(merchantEntityArgumentCaptor.getValue().getTotalTransactionAmount(), is(amount));
   }
+
+  @Test
+  void deleteMerchant_will_success(){
+    final long id = 2L;
+    final MerchantEntity merchant =
+        MerchantEntity.builder()
+            .id(id)
+            .active(true)
+            .email("jjj@a.b")
+            .merchantName("jjj")
+            .totalTransactionAmount(BigDecimal.valueOf(0))
+            .description("desc").transactions(List.of())
+            .build();
+    when(merchantRepository.findById(id)).thenReturn(Optional.of(merchant));
+    merchantService.deleteMerchant(id);
+    verify(merchantRepository, times(1)).deleteById(id);
+  }
+
+  @Test
+  @DisplayName("deleteMerchant will fail for existing transactions")
+  void deleteMerchant_will_failForExistingTransactions(){
+    final long id = 2L;
+    final MerchantEntity merchant =
+        MerchantEntity.builder()
+            .id(id)
+            .active(true)
+            .email("jjj@a.b")
+            .merchantName("jjj")
+            .totalTransactionAmount(BigDecimal.valueOf(0))
+            .description("desc").transactions(List.of(TransactionEntity.builder().build()))
+            .build();
+    when(merchantRepository.findById(id)).thenReturn(Optional.of(merchant));
+    ConflictException exception =
+        Assertions.assertThrows(ConflictException.class, () -> merchantService.deleteMerchant(id));
+    assertThat(exception.getMessage(), is("Merchant has transactions and cannot be deleted"));
+  }
+
 }

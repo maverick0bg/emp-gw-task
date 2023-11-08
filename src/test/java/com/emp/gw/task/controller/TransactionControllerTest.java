@@ -30,24 +30,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Testcontainers
 @WebAppConfiguration
 @ContextConfiguration(classes = {TaskApplication.class})
-class TransactionControllerTest {
-
-  @Container
-  public static PostgreSQLContainer postgreSQLContainer =
-      new PostgreSQLContainer("postgres:15.4")
-          .withDatabaseName("task")
-          .withUsername("postgres")
-          .withPassword("postgres");
-
-  @DynamicPropertySource
-  static void postgresqlProperties(DynamicPropertyRegistry registry) {
-    registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-    registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
-    registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-  }
+class TransactionControllerTest extends IntegrationTestBase {
 
   @Autowired MockMvc mockMvc;
   ObjectMapper objectMapper = new ObjectMapper();

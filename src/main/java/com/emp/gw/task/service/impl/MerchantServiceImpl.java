@@ -10,6 +10,7 @@ import com.emp.gw.task.repository.MerchantRepository;
 import com.emp.gw.task.service.MerchantService;
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.stereotype.Service;
@@ -68,6 +69,16 @@ public class MerchantServiceImpl implements MerchantService {
     MerchantEntity merchant = findMerchantEntity(id);
     merchant.setTotalTransactionAmount(merchant.getTotalTransactionAmount().add(amount));
     merchantRepository.save(merchant);
+  }
+
+  @Override
+  public void deleteMerchant(Long merchantId) {
+    MerchantEntity merchant = findMerchantEntity(merchantId);
+    if (Objects.isNull(merchant.getTransactions()) || merchant.getTransactions().isEmpty()) {
+      merchantRepository.deleteById(merchantId);
+    } else {
+      throw new ConflictException("Merchant has transactions and cannot be deleted");
+    }
   }
 
   private MerchantEntity findMerchantEntity(Long id) {

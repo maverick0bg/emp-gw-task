@@ -8,6 +8,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,5 +43,11 @@ public class MerchantController {
       @PathVariable("merchantId") @NotNull Long merchantId,
       @RequestBody @NotNull Map<MerchantUpdatableFields, Object> body) {
     return merchantService.updateMerchant(merchantId, body);
+  }
+
+  @DeleteMapping("/{merchantId}")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public void deleteMerchant(@PathVariable("merchantId") @NotNull Long merchantId) {
+    merchantService.deleteMerchant(merchantId);
   }
 }

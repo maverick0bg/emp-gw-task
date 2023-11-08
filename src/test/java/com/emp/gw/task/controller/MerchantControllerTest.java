@@ -3,6 +3,7 @@ package com.emp.gw.task.controller;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -11,7 +12,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.emp.gw.task.TaskApplication;
 import com.emp.gw.task.dto.MerchantDto;
+import com.emp.gw.task.dto.TransactionDto;
+import com.emp.gw.task.enums.TransactionStatuses;
+import com.emp.gw.task.enums.TransactionTypes;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,32 +34,19 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.math.BigDecimal;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Testcontainers
 @WebAppConfiguration
 @ContextConfiguration(classes = {TaskApplication.class})
-class MerchantControllerTest {
-
-  @Container
-  public static PostgreSQLContainer postgreSQLContainer =
-      new PostgreSQLContainer("postgres:15.4")
-          .withDatabaseName("task")
-          .withUsername("postgres")
-          .withPassword("postgres");
-
-  @DynamicPropertySource
-  static void postgresqlProperties(DynamicPropertyRegistry registry) {
-    registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-    registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
-    registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-  }
+class MerchantControllerTest extends IntegrationTestBase {
 
   @Autowired MockMvc mockMvc;
 
   ObjectMapper objectMapper = new ObjectMapper();
-  
+
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = "admin")
   void createMerchant() throws Exception {
@@ -161,5 +153,139 @@ class MerchantControllerTest {
         .andExpect(jsonPath("$.active").value(true))
         .andExpect(jsonPath("$.description").value(ktmDescriptionUpdated))
         .andExpect(jsonPath("$.merchantName").value(ktmNameUpdated));
+  }
+
+  @Test
+  @WithMockUser(username = "admin", password = "admin", roles = "admin")
+  void deleteMerchant() throws Exception {
+    final MerchantDto merchantRequest =
+        MerchantDto.builder()
+            .merchantName("suzuki")
+            .email("suzuki@a.com")
+            .description("suzuki description")
+            .build();
+    MvcResult mvcResult =
+        mockMvc
+            .perform(
+                post("/merchant")
+                    .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
+                    .with(SecurityMockMvcRequestPostProcessors.csrf())
+                    .content(objectMapper.writeValueAsString(merchantRequest))
+                    .contentType("application/json"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    MerchantDto resultMerchant =
+        objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MerchantDto.class);
+
+    assertThat(resultMerchant.isActive(), is(false));
+
+    final String ktmDescriptionUpdated = "ktm description updated";
+    final String ktmNameUpdated = "ktm updated";
+    mockMvc
+        .perform(
+            patch("/merchant/" + resultMerchant.getId())
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .content(
+                    String.format(
+                        """
+                    {
+                      "ACTIVE": true,
+                      "DESCRIPTION": "%s",
+                      "MERCHANT_NAME": "%s"
+                    }
+                    """,
+                        ktmDescriptionUpdated, ktmNameUpdated))
+                .contentType("application/json"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.active").value(true))
+        .andExpect(jsonPath("$.description").value(ktmDescriptionUpdated))
+        .andExpect(jsonPath("$.merchantName").value(ktmNameUpdated));
+
+    mockMvc
+        .perform(
+            delete("/merchant/" + resultMerchant.getId())
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .contentType("application/json"))
+        .andExpect(status().isAccepted())
+        .andExpect(jsonPath("$").doesNotExist());
+  }
+
+  @Test
+  @DisplayName("Test DELETE '/user' endpoint will fail for existing transactions")
+  @WithMockUser(username = "admin", password = "admin", roles = "admin")
+  void deleteMerchant_will_failForExistingTransactions() throws Exception {
+    final MerchantDto merchantRequest =
+        MerchantDto.builder()
+            .merchantName("honda")
+            .email("honda@a.com")
+            .description("ktm description")
+            .build();
+    MvcResult mvcResult =
+        mockMvc
+            .perform(
+                post("/merchant")
+                    .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
+                    .with(SecurityMockMvcRequestPostProcessors.csrf())
+                    .content(objectMapper.writeValueAsString(merchantRequest))
+                    .contentType("application/json"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    MerchantDto resultMerchant =
+        objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MerchantDto.class);
+
+    assertThat(resultMerchant.isActive(), is(false));
+
+    final String ktmDescriptionUpdated = "ktm description updated";
+    final String ktmNameUpdated = "ktm updated";
+    mockMvc
+        .perform(
+            patch("/merchant/" + resultMerchant.getId())
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .content(
+                    String.format(
+                        """
+                    {
+                      "ACTIVE": true,
+                      "DESCRIPTION": "%s",
+                      "MERCHANT_NAME": "%s"
+                    }
+                    """,
+                        ktmDescriptionUpdated, ktmNameUpdated))
+                .contentType("application/json"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.active").value(true))
+        .andExpect(jsonPath("$.description").value(ktmDescriptionUpdated))
+        .andExpect(jsonPath("$.merchantName").value(ktmNameUpdated));
+
+    TransactionDto transaction =
+        TransactionDto.builder()
+            .customerEmail("e@dddd.com")
+            .customerPhone("1234567890")
+            .merchant(MerchantDto.builder().id(resultMerchant.getId()).build())
+            .amount(BigDecimal.ONE)
+            .transactionStatus(TransactionStatuses.APPROVED)
+            .transactionType(TransactionTypes.AUTHORISE)
+            .build();
+    mockMvc
+        .perform(
+            post("/transaction")
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .content(objectMapper.writeValueAsString(transaction))
+                .contentType("application/json"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").isNotEmpty())
+        .andExpect(jsonPath("$.transactionStatus").value(TransactionStatuses.APPROVED.toString()));
+
+    mockMvc
+        .perform(
+            delete("/merchant/" + resultMerchant.getId())
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .contentType("application/json"))
+        .andExpect(status().isConflict());
   }
 }

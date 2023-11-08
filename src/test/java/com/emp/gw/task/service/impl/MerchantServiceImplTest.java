@@ -3,6 +3,7 @@ package com.emp.gw.task.service.impl;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,15 +16,15 @@ import com.emp.gw.task.mapper.MerchantMapper;
 import com.emp.gw.task.model.entity.MerchantEntity;
 import com.emp.gw.task.repository.MerchantRepository;
 import com.emp.gw.task.service.MerchantService;
-
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
-
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -33,6 +34,9 @@ class MerchantServiceImplTest {
   private MerchantService merchantService;
   @Mock MerchantRepository merchantRepository;
   @Mock MerchantMapper merchantMapper;
+
+  ArgumentCaptor<MerchantEntity> merchantEntityArgumentCaptor =
+      ArgumentCaptor.forClass(MerchantEntity.class);
 
   @BeforeAll
   void setUp() {
@@ -107,14 +111,14 @@ class MerchantServiceImplTest {
             .description(foundMerchant.getDescription())
             .build();
     when(merchantMapper.toDto(foundMerchant)).thenReturn(expectedMerchant);
-    MerchantDto result = merchantService.getMerchant(1L);
+    MerchantDto result = merchantService.findMerchant(1L);
     assertThat(result, is(expectedMerchant));
   }
 
   @Test
   void getMerchant_will_throwNotFound() {
     when(merchantRepository.findById(1L)).thenReturn(Optional.empty());
-    Assert.assertThrows(NotFoundException.class, () -> merchantService.getMerchant(1L));
+    Assert.assertThrows(NotFoundException.class, () -> merchantService.findMerchant(1L));
   }
 
   @Test
@@ -159,7 +163,7 @@ class MerchantServiceImplTest {
   @Test
   void updateMerchant_trowsNotFound() {
     when(merchantRepository.findById(11L)).thenReturn(Optional.empty());
-    Assert.assertThrows(NotFoundException.class, () -> merchantService.getMerchant(11L));
+    Assert.assertThrows(NotFoundException.class, () -> merchantService.findMerchant(11L));
   }
 
   @Test
@@ -190,8 +194,27 @@ class MerchantServiceImplTest {
 
   @Test
   void getActiveMerchant_will_throwNotFound() {
-    when(merchantRepository.findByIdAndActiveTrue(1L)).thenReturn(Optional.empty());
-    Assert.assertThrows(NotFoundException.class, () -> merchantService.getMerchant(1L));
+    when(merchantRepository.findByIdAndActiveTrue(33L)).thenReturn(Optional.empty());
+    Assert.assertThrows(NotFoundException.class, () -> merchantService.getActiveMerchant(33L));
   }
 
+  @Test
+  @DisplayName("addAmountToMerchantBalance will success")
+  void addAmount_willSuccess() {
+    reset(merchantRepository);
+    final MerchantEntity merchant =
+        MerchantEntity.builder()
+            .id(1L)
+            .active(true)
+            .email("jjj@a.b")
+            .merchantName("jjj")
+            .totalTransactionAmount(BigDecimal.valueOf(0))
+            .description("desc")
+            .build();
+    when(merchantRepository.findById(1L)).thenReturn(Optional.of(merchant));
+    final BigDecimal amount = BigDecimal.valueOf(100);
+    merchantService.addAmountToMerchantBalance(1L, amount);
+    verify(merchantRepository, times(1)).save(merchantEntityArgumentCaptor.capture());
+    assertThat(merchantEntityArgumentCaptor.getValue().getTotalTransactionAmount(), is(amount));
+  }
 }

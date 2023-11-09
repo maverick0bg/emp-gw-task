@@ -23,7 +23,7 @@
         <lombok.version>1.18.30</lombok.version>
         <jackson.version>2.15.3</jackson.version>
         <shedlock-spring.version>5.8.0</shedlock-spring.version>
-        <shedlock.template.version>5.8.0</shedlock.template.version>
+        <shedlock.template.version>5.9.0</shedlock.template.version>
     </properties>
     <dependencyManagement>
         <dependencies>

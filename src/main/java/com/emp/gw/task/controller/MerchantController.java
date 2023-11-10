@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,18 +28,21 @@ public class MerchantController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   public MerchantDto createMerchant(@RequestBody @NotNull @Validated MerchantDto body) {
     return merchantService.createMerchant(body);
   }
 
   @GetMapping("/{merchantId}")
   @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MERCHANT')")
   public MerchantDto getMerchant(@PathVariable("merchantId") @NotNull Long merchantId) {
     return merchantService.findMerchant(merchantId);
   }
 
   @PatchMapping("/{merchantId}")
   @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   public MerchantDto updateMerchant(
       @PathVariable("merchantId") @NotNull Long merchantId,
       @RequestBody @NotNull Map<MerchantUpdatableFields, Object> body) {
@@ -47,6 +51,7 @@ public class MerchantController {
 
   @DeleteMapping("/{merchantId}")
   @ResponseStatus(HttpStatus.ACCEPTED)
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   public void deleteMerchant(@PathVariable("merchantId") @NotNull Long merchantId) {
     merchantService.deleteMerchant(merchantId);
   }

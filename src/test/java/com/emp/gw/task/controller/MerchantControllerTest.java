@@ -3,6 +3,9 @@ package com.emp.gw.task.controller;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -16,25 +19,18 @@ import com.emp.gw.task.dto.TransactionDto;
 import com.emp.gw.task.enums.TransactionStatuses;
 import com.emp.gw.task.enums.TransactionTypes;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
-import java.math.BigDecimal;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -48,7 +44,7 @@ class MerchantControllerTest extends IntegrationTestBase {
   ObjectMapper objectMapper = new ObjectMapper();
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = "admin")
+  @WithMockUser(username = "admin", password = "admin", authorities = "ROLE_ADMIN")
   void createMerchant() throws Exception {
     final MerchantDto merchantRequest =
         MerchantDto.builder()
@@ -59,8 +55,8 @@ class MerchantControllerTest extends IntegrationTestBase {
     mockMvc
         .perform(
             post("/merchant")
-                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .with(httpBasic("admin", "admin"))
+                .with(csrf())
                 .content(objectMapper.writeValueAsString(merchantRequest))
                 .contentType("application/json"))
         .andExpect(status().isCreated())
@@ -72,43 +68,51 @@ class MerchantControllerTest extends IntegrationTestBase {
   }
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = "ADMIN")
-  void getMerchant() throws Exception {
+  @WithMockUser(username = "admin", password = "admin", authorities = "ROLE_MERCHANT")
+  void createMerchant_will_beRejectedForWrongRole() throws Exception {
     final MerchantDto merchantRequest =
         MerchantDto.builder()
-            .merchantName("rtl")
-            .email("rtl@a.com")
-            .description("rtl description")
+            .merchantName("MDB")
+            .email("mdb@a.com")
+            .description("MDB description")
             .build();
-    MvcResult mvcResult =
-        mockMvc
-            .perform(
-                post("/merchant")
-                    .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
-                    .with(SecurityMockMvcRequestPostProcessors.csrf())
-                    .content(objectMapper.writeValueAsString(merchantRequest))
-                    .contentType("application/json"))
-            .andExpect(status().isCreated())
-            .andReturn();
-    MerchantDto resultMerchant =
-        objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MerchantDto.class);
-    mvcResult =
-        mockMvc
-            .perform(
-                get("/merchant/" + resultMerchant.getId())
-                    .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
-                    .with(SecurityMockMvcRequestPostProcessors.csrf())
-                    .contentType("application/json"))
-            .andExpect(status().isOk())
-            .andReturn();
-
-    assertThat(
-        objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MerchantDto.class),
-        is(equalTo(resultMerchant)));
+    mockMvc
+        .perform(
+            post("/merchant")
+                .with(httpBasic("admin", "admin"))
+                .with(csrf())
+                .content(objectMapper.writeValueAsString(merchantRequest))
+                .contentType("application/json"))
+        .andExpect(status().isForbidden());
   }
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = "admin")
+  void getMerchant_will_success_for_admin() throws Exception {
+    final MerchantDto resultMerchant = createMerchantAsAdmin("eml1@mail.com");
+    successfullyGetMerchant(resultMerchant, "admin", "admin", "ROLE_ADMIN");
+  }
+
+  @Test
+  void getMerchant_will_success_for_merchant() throws Exception {
+    final MerchantDto resultMerchant = createMerchantAsAdmin("eml2@mail.com");
+    successfullyGetMerchant(resultMerchant, "merchant", "merchant", "ROLE_MERCHANT");
+  }
+
+  @Test
+  void getMerchant_will_beRejected_for_other_role() throws Exception {
+    final MerchantDto resultMerchant = createMerchantAsAdmin("eml3@mail.com");
+    mockMvc
+        .perform(
+            get("/merchant/" + resultMerchant.getId())
+                .with(httpBasic("user", "password"))
+                .with(csrf())
+                .with(user("user").authorities(() -> "ROLE_USER"))
+                .contentType("application/json"))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  @WithMockUser(username = "admin", password = "admin", authorities = "ROLE_ADMIN")
   void updateMerchant() throws Exception {
     final MerchantDto merchantRequest =
         MerchantDto.builder()
@@ -120,8 +124,8 @@ class MerchantControllerTest extends IntegrationTestBase {
         mockMvc
             .perform(
                 post("/merchant")
-                    .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
-                    .with(SecurityMockMvcRequestPostProcessors.csrf())
+                    .with(httpBasic("admin", "admin"))
+                    .with(csrf())
                     .content(objectMapper.writeValueAsString(merchantRequest))
                     .contentType("application/json"))
             .andExpect(status().isCreated())
@@ -136,8 +140,8 @@ class MerchantControllerTest extends IntegrationTestBase {
     mockMvc
         .perform(
             patch("/merchant/" + resultMerchant.getId())
-                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .with(httpBasic("admin", "admin"))
+                .with(csrf())
                 .content(
                     String.format(
                         """
@@ -156,7 +160,7 @@ class MerchantControllerTest extends IntegrationTestBase {
   }
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = "admin")
+  @WithMockUser(username = "admin", password = "admin", authorities = "ROLE_ADMIN")
   void deleteMerchant() throws Exception {
     final MerchantDto merchantRequest =
         MerchantDto.builder()
@@ -168,8 +172,8 @@ class MerchantControllerTest extends IntegrationTestBase {
         mockMvc
             .perform(
                 post("/merchant")
-                    .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
-                    .with(SecurityMockMvcRequestPostProcessors.csrf())
+                    .with(httpBasic("admin", "admin"))
+                    .with(csrf())
                     .content(objectMapper.writeValueAsString(merchantRequest))
                     .contentType("application/json"))
             .andExpect(status().isCreated())
@@ -184,8 +188,8 @@ class MerchantControllerTest extends IntegrationTestBase {
     mockMvc
         .perform(
             patch("/merchant/" + resultMerchant.getId())
-                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .with(httpBasic("admin", "admin"))
+                .with(csrf())
                 .content(
                     String.format(
                         """
@@ -205,16 +209,16 @@ class MerchantControllerTest extends IntegrationTestBase {
     mockMvc
         .perform(
             delete("/merchant/" + resultMerchant.getId())
-                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .with(httpBasic("admin", "admin"))
+                .with(csrf())
                 .contentType("application/json"))
         .andExpect(status().isAccepted())
         .andExpect(jsonPath("$").doesNotExist());
   }
 
   @Test
-  @DisplayName("Test DELETE '/user' endpoint will fail for existing transactions")
-  @WithMockUser(username = "admin", password = "admin", roles = "admin")
+  @DisplayName("Test DELETE '/merchant' endpoint will fail for existing transactions")
+  @WithMockUser(username = "admin", password = "admin", authorities = "ROLE_ADMIN")
   void deleteMerchant_will_failForExistingTransactions() throws Exception {
     final MerchantDto merchantRequest =
         MerchantDto.builder()
@@ -226,8 +230,8 @@ class MerchantControllerTest extends IntegrationTestBase {
         mockMvc
             .perform(
                 post("/merchant")
-                    .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
-                    .with(SecurityMockMvcRequestPostProcessors.csrf())
+                    .with(httpBasic("admin", "admin"))
+                    .with(csrf())
                     .content(objectMapper.writeValueAsString(merchantRequest))
                     .contentType("application/json"))
             .andExpect(status().isCreated())
@@ -242,8 +246,8 @@ class MerchantControllerTest extends IntegrationTestBase {
     mockMvc
         .perform(
             patch("/merchant/" + resultMerchant.getId())
-                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .with(httpBasic("admin", "admin"))
+                .with(csrf())
                 .content(
                     String.format(
                         """
@@ -272,8 +276,8 @@ class MerchantControllerTest extends IntegrationTestBase {
     mockMvc
         .perform(
             post("/transaction")
-                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .with(httpBasic("admin", "admin"))
+                .with(csrf())
                 .content(objectMapper.writeValueAsString(transaction))
                 .contentType("application/json"))
         .andExpect(status().isOk())
@@ -283,9 +287,51 @@ class MerchantControllerTest extends IntegrationTestBase {
     mockMvc
         .perform(
             delete("/merchant/" + resultMerchant.getId())
-                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .with(httpBasic("admin", "admin"))
+                .with(csrf())
                 .contentType("application/json"))
         .andExpect(status().isConflict());
+  }
+
+  private void successfullyGetMerchant(
+      MerchantDto merchantForSearch, String user, String password, String authority)
+      throws Exception {
+    MvcResult mvcResult =
+        mockMvc
+            .perform(
+                get("/merchant/" + merchantForSearch.getId())
+                    .with(httpBasic(user, password))
+                    .with(csrf())
+                    .with(user(user).authorities(() -> authority))
+                    .contentType("application/json"))
+            .andExpect(status().isOk())
+            .andReturn();
+
+    assertThat(
+        objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MerchantDto.class),
+        is(equalTo(merchantForSearch)));
+  }
+
+  private MerchantDto createMerchantAsAdmin(String email) throws Exception {
+    final MerchantDto merchantRequest =
+        MerchantDto.builder()
+            .merchantName("rtl")
+            .email(email)
+            .description("rtl description")
+            .build();
+    MvcResult mvcResult =
+        mockMvc
+            .perform(
+                post("/merchant")
+                    .with(httpBasic("admin", "admin"))
+                    .with(csrf())
+                    .with(user("admin").authorities(() -> "ROLE_ADMIN"))
+                    .content(objectMapper.writeValueAsString(merchantRequest))
+                    .contentType("application/json"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    MerchantDto resultMerchant =
+        objectMapper.readValue(mvcResult.getResponse().getContentAsString(), MerchantDto.class);
+    return resultMerchant;
   }
 }

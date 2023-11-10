@@ -38,7 +38,7 @@ class TransactionControllerTest extends IntegrationTestBase {
   ObjectMapper objectMapper = new ObjectMapper();
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = "admin")
+  @WithMockUser(username = "admin", password = "admin", authorities = "ROLE_ADMIN")
   void createTransaction() throws Exception {
     TransactionDto transaction =
         TransactionDto.builder()
@@ -59,5 +59,27 @@ class TransactionControllerTest extends IntegrationTestBase {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").isNotEmpty())
         .andExpect(jsonPath("$.transactionStatus").value(TransactionStatuses.APPROVED.toString()));
+  }
+
+  @Test
+  @WithMockUser(username = "admin", password = "admin", authorities = "ROLE_NONE")
+  void createTransaction_will_failWithForbidden() throws Exception {
+    TransactionDto transaction =
+        TransactionDto.builder()
+            .customerEmail("e@dddd.com")
+            .customerPhone("1234567890")
+            .merchant(MerchantDto.builder().id(1L).build())
+            .amount(BigDecimal.ONE)
+            .transactionStatus(TransactionStatuses.APPROVED)
+            .transactionType(TransactionTypes.AUTHORISE)
+            .build();
+    mockMvc
+        .perform(
+            post("/transaction")
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .content(objectMapper.writeValueAsString(transaction))
+                .contentType("application/json"))
+        .andExpect(status().isForbidden());
   }
 }

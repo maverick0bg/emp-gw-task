@@ -15,4 +15,5 @@
             author="maverick02bg"/>
     <include file="db/changelog/2023/2023-05-add auditing-columns.xml" id="5"
             author="maverick02bg"/>
+    <include file="db/changelog/2023/2023-06-update-authorities.xml" id="6"/>
 </databaseChangeLog>

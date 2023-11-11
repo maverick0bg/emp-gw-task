@@ -1,4 +1,4 @@
-# emp-gw-task [![Build Status](https://travis-ci.org/empirical-org/emp-gw-task.svg?branch=master)]
+# emp-gw-task [![Build Status](https://github.com/maverick0bg/emp-gw-task/actions/workflows/build.yml/badge.svg)]
 
 # Conceptual payment service
 

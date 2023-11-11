@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import com.emp.gw.task.dto.MerchantDto;
 import com.emp.gw.task.dto.TransactionDto;
 import com.emp.gw.task.dto.TransactionResponseDto;
+import com.emp.gw.task.enums.TransactionStatuses;
 import com.emp.gw.task.exception.InvalidInputException;
 import com.emp.gw.task.mapper.TransactionEntityMapper;
 import com.emp.gw.task.model.entity.TransactionEntity;
@@ -28,6 +29,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mapstruct.factory.Mappers;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -37,6 +40,7 @@ class ChargeTransactionServiceImplTest {
 
   @Mock private TransactionRepository transactionRepository;
   @Mock private MerchantService merchantService;
+  @Captor private ArgumentCaptor<TransactionEntity> transactionEntityArgumentCaptor;
 
   TransactionService transactionService;
   private TransactionEntityMapper mapper;
@@ -204,15 +208,19 @@ class ChargeTransactionServiceImplTest {
   }
 
   @Test
-  @DisplayName("Create transaction will fail for invalid related transaction status")
+  @DisplayName(
+      "Create transaction will store with status ERROR for invalid related transaction status")
   void createTransaction_willFail_for_invalidRelatedTransactionStatus() {
     final MerchantDto merchantDto = MerchantDto.builder().id(1L).build();
+    final BigDecimal amount = BigDecimal.valueOf(0.02);
+
     when(merchantService.getActiveMerchant(Mockito.anyLong())).thenReturn(merchantDto);
     final TransactionEntity relatedTransaction =
         TransactionEntity.builder()
             .id(UUID.randomUUID())
             .transactionStatus(REVERSED)
             .transactionType(AUTHORISE)
+            .amount(amount)
             .build();
 
     when(transactionRepository.findById(relatedTransaction.getId()))
@@ -227,32 +235,35 @@ class ChargeTransactionServiceImplTest {
             .build();
     when(transactionRepository.findById(relatedTransaction.getId()))
         .thenReturn(java.util.Optional.of(relatedTransaction));
-    when(transactionRepository.save(Mockito.any(TransactionEntity.class))).thenReturn(transaction);
+    when(transactionRepository.save(transactionEntityArgumentCaptor.capture()))
+        .thenReturn(transaction);
     final TransactionDto transactionDto =
         TransactionDto.builder()
             .transactionType(CHARGE)
             .transactionStatus(APPROVED)
             .merchant(merchantDto)
-            .amount(BigDecimal.valueOf(0.02))
+            .amount(amount)
             .relatedTransaction(mapper.toDto(relatedTransaction))
             .build();
-    InvalidInputException exception =
-        assertThrows(
-            InvalidInputException.class,
-            () -> transactionService.createTransaction(transactionDto));
-    assertThat(exception.getMessage(), is("Related transaction has invalid status."));
+    TransactionResponseDto saved = transactionService.createTransaction(transactionDto);
+    assertThat(
+        transactionEntityArgumentCaptor.getValue().getTransactionStatus(),
+        is(TransactionStatuses.ERROR));
   }
 
   @Test
   @DisplayName("Create transaction will fail for invalid related transaction type")
   void createTransaction_willFail_for_invalidRelatedTransactionType() {
     final MerchantDto merchantDto = MerchantDto.builder().id(1L).build();
+    final BigDecimal amount = BigDecimal.valueOf(0.02);
+
     when(merchantService.getActiveMerchant(Mockito.anyLong())).thenReturn(merchantDto);
     final TransactionEntity relatedTransaction =
         TransactionEntity.builder()
             .id(UUID.randomUUID())
             .transactionStatus(APPROVED)
             .transactionType(REVERSAL)
+            .amount(amount)
             .build();
 
     when(transactionRepository.findById(relatedTransaction.getId()))
@@ -273,7 +284,7 @@ class ChargeTransactionServiceImplTest {
             .transactionType(CHARGE)
             .transactionStatus(APPROVED)
             .merchant(merchantDto)
-            .amount(BigDecimal.valueOf(0.02))
+            .amount(amount)
             .relatedTransaction(mapper.toDto(relatedTransaction))
             .build();
     InvalidInputException exception =

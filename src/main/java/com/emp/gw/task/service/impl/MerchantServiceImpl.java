@@ -87,6 +87,13 @@ public class MerchantServiceImpl implements MerchantService {
     }
   }
 
+  @Override
+  public void subtractAmountFromMerchantBalance(Long id, BigDecimal amount) {
+    MerchantEntity merchant = findMerchantEntity(id);
+    merchant.setTotalTransactionAmount(merchant.getTotalTransactionAmount().subtract(amount));
+    merchantRepository.save(merchant);
+  }
+
   private MerchantEntity findMerchantEntity(Long id) {
     return merchantRepository
         .findById(id)

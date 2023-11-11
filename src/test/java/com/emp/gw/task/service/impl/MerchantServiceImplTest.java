@@ -18,7 +18,6 @@ import com.emp.gw.task.model.entity.TransactionEntity;
 import com.emp.gw.task.repository.MerchantRepository;
 import com.emp.gw.task.service.MerchantService;
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -223,7 +222,7 @@ class MerchantServiceImplTest {
   }
 
   @Test
-  void deleteMerchant_will_success(){
+  void deleteMerchant_will_success() {
     final long id = 2L;
     final MerchantEntity merchant =
         MerchantEntity.builder()
@@ -232,7 +231,8 @@ class MerchantServiceImplTest {
             .email("jjj@a.b")
             .merchantName("jjj")
             .totalTransactionAmount(BigDecimal.valueOf(0))
-            .description("desc").transactions(List.of())
+            .description("desc")
+            .transactions(List.of())
             .build();
     when(merchantRepository.findById(id)).thenReturn(Optional.of(merchant));
     merchantService.deleteMerchant(id);
@@ -241,7 +241,7 @@ class MerchantServiceImplTest {
 
   @Test
   @DisplayName("deleteMerchant will fail for existing transactions")
-  void deleteMerchant_will_failForExistingTransactions(){
+  void deleteMerchant_will_failForExistingTransactions() {
     final long id = 2L;
     final MerchantEntity merchant =
         MerchantEntity.builder()
@@ -250,7 +250,8 @@ class MerchantServiceImplTest {
             .email("jjj@a.b")
             .merchantName("jjj")
             .totalTransactionAmount(BigDecimal.valueOf(0))
-            .description("desc").transactions(List.of(TransactionEntity.builder().build()))
+            .description("desc")
+            .transactions(List.of(TransactionEntity.builder().build()))
             .build();
     when(merchantRepository.findById(id)).thenReturn(Optional.of(merchant));
     ConflictException exception =
@@ -258,4 +259,39 @@ class MerchantServiceImplTest {
     assertThat(exception.getMessage(), is("Merchant has transactions and cannot be deleted"));
   }
 
+  @Test
+  @DisplayName("subtractAmountFromMerchantBalance will success written by GH co pilot")
+  void subtractAmount_willSuccess() {
+    reset(merchantRepository);
+    final long id = 1L;
+    final MerchantEntity merchant =
+        MerchantEntity.builder()
+            .id(id)
+            .active(true)
+            .email("jjj@a.b")
+            .merchantName("jjj")
+            .totalTransactionAmount(BigDecimal.valueOf(100))
+            .description("desc")
+            .build();
+    when(merchantRepository.findById(id)).thenReturn(Optional.of(merchant));
+    final BigDecimal amount = BigDecimal.valueOf(100);
+    merchantService.subtractAmountFromMerchantBalance(id, amount);
+    verify(merchantRepository, times(1)).save(merchantEntityArgumentCaptor.capture());
+    assertThat(
+        merchantEntityArgumentCaptor.getValue().getTotalTransactionAmount(), is(BigDecimal.ZERO));
+  }
+
+  @Test
+  @DisplayName("subtractAmountFromMerchantBalance will fail for missing merchant by GH co pilot")
+  void subtractAmount_willFailForMissingMerchant() {
+    reset(merchantRepository);
+    final long id = 1L;
+    final BigDecimal amount = BigDecimal.valueOf(100);
+    when(merchantRepository.findById(id)).thenReturn(Optional.empty());
+    NotFoundException exception =
+        Assertions.assertThrows(
+            NotFoundException.class,
+            () -> merchantService.subtractAmountFromMerchantBalance(id, amount));
+    assertThat(exception.getMessage(), is("Merchant not found"));
+  }
 }

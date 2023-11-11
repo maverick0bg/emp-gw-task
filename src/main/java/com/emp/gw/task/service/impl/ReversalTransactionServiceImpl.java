@@ -15,48 +15,42 @@ import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@Service(value = TransactionServiceFactory.CHARGE)
+@Service(value = TransactionServiceFactory.REVERSAL)
 @RequiredArgsConstructor
-public class ChargeTransactionServiceImpl extends AbstractTransactionService {
+public class ReversalTransactionServiceImpl extends AbstractTransactionService {
 
   private final TransactionRepository transactionRepository;
   private final TransactionEntityMapper transactionEntityMapper;
   private final MerchantService merchantService;
+  private TransactionEntity relatedTransaction;
 
   protected void validateAndSetStatus(TransactionDto transactionRequestDto) {
     if (isNull(transactionRequestDto.getRelatedTransaction())) {
-      throw new InvalidInputException("Charge transaction must have a related transaction");
+      throw new InvalidInputException("Reversal transaction must have a related transaction");
     }
-
-    if (isNull(transactionRequestDto.getAmount())
-        || transactionRequestDto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-      throw new InvalidInputException("Amount is required for charge transaction");
-    }
-
-    TransactionEntity relatedTransaction =
+    relatedTransaction =
         transactionRepository
             .findById(transactionRequestDto.getRelatedTransaction().getId())
             .orElseThrow(() -> new InvalidInputException("Related transaction does not exist"));
 
-    if (!transactionRequestDto.getAmount().equals(relatedTransaction.getAmount())) {
-      throw new InvalidInputException(
-          "Charge amount can't be different than related transaction amount");
-    }
-
     if (!relatedTransaction.getTransactionType().equals(TransactionTypes.AUTHORISE)) {
-      throw new InvalidInputException("Only authorize transactions can be charged.");
+      throw new InvalidInputException("Only authorize transactions can be reversed.");
     }
 
-    if (!(relatedTransaction.getTransactionStatus().equals(TransactionStatuses.APPROVED)
-        || relatedTransaction.getTransactionStatus().equals(TransactionStatuses.REFUNDED))) {
-      transactionRequestDto.setTransactionStatus(TransactionStatuses.ERROR);
+    if (!(relatedTransaction.getTransactionStatus().equals(TransactionStatuses.APPROVED))) {
+      throw new InvalidInputException("Related transaction has invalid status.");
+    }
+
+    if (!(isNull(transactionRequestDto.getAmount())
+        || transactionRequestDto.getAmount().compareTo(BigDecimal.ZERO) == 0)) {
+      throw new InvalidInputException("Amount is not allowed for reversal transaction");
     }
   }
 
   @Override
   protected void updateRelatedObjects(TransactionDto transactionRequestDto) {
-    merchantService.addAmountToMerchantBalance(
-        transactionRequestDto.getMerchant().getId(), transactionRequestDto.getAmount());
+    relatedTransaction.setTransactionStatus(TransactionStatuses.REVERSED);
+    transactionRepository.save(relatedTransaction);
   }
 
   @Override

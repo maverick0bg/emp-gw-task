@@ -2,7 +2,7 @@ package com.emp.gw.task.model.entity;
 
 import com.emp.gw.task.enums.TransactionStatuses;
 import com.emp.gw.task.enums.TransactionTypes;
-import com.emp.gw.task.validator.Phone;
+import com.emp.gw.task.validator.PhoneNumberConstraint;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -56,7 +56,8 @@ public class TransactionEntity extends AuditableEntity implements Serializable {
   private int statusId;
 
   @Email private String customerEmail;
-  @Phone private String customerPhone;
+  @PhoneNumberConstraint
+  private String customerPhone;
 
   @OneToOne
   @JoinColumn(name = "reference_id")

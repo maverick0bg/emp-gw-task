@@ -9,6 +9,10 @@ import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+/**
+ * Configuration class for auditing.
+ * It configures the date time provider to use UTC time zone.
+ */
 @Configuration
 @EnableJpaAuditing(dateTimeProviderRef = "utcDateTimeProvider")
 @EnableTransactionManagement

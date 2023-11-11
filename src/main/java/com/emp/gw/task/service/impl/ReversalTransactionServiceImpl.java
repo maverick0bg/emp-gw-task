@@ -15,6 +15,13 @@ import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Charge transaction service. Implements the specific logic for Charge transactions.
+ *
+ * <p>Charge transaction - has amount and used to charge customer's amount. Charge Transaction must
+ * refer Authorize Transaction. Charge Transaction can be referenced from Reversal Transaction. Only
+ * approved or refunded transactions can be referenced.
+ */
 @Service(value = TransactionServiceFactory.REVERSAL)
 @RequiredArgsConstructor
 public class ReversalTransactionServiceImpl extends AbstractTransactionService {

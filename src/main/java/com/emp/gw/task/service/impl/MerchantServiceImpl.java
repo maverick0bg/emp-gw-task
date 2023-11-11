@@ -15,6 +15,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.stereotype.Service;
 
+/**
+ * Merchant service. Implements the specific logic for Merchant.
+ *
+ * <p>Merchant - has name, email, address, phone number and total transaction amount. Merchant can
+ * be referenced from Transaction. Merchant can be deleted only if it has no transactions.
+ */
 @Service
 @RequiredArgsConstructor
 public class MerchantServiceImpl implements MerchantService {

@@ -29,6 +29,10 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+/**
+ * Security configuration. Defines the needed beans responsible for authentication and authorization
+ * processes.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity

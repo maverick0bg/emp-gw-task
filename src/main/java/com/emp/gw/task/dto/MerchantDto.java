@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 
+/**
+ * Merchant DTO. This class is used to transfer merchant data between the controller and the
+ * service.
+ */
 @Builder
 @Jacksonized
 @Data

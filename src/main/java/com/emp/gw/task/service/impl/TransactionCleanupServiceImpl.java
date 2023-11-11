@@ -13,6 +13,13 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+/**
+ * Transaction cleanup service. Used to clean up old transactions.
+ *
+ * <p>Transaction cleanup - is a process that deletes all transactions older than 1 hour. It is
+ * configured to run every hour at 21st minute and at 21st second. The scheduler is configured in
+ * cron syntax.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j

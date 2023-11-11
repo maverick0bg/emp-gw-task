@@ -5,6 +5,10 @@ import com.emp.gw.task.enums.MerchantUpdatableFields;
 import java.math.BigDecimal;
 import java.util.Map;
 
+/**
+ * Merchant service. This interface is used to define the contract for accessing and manipulating
+ * merchant entities.
+ */
 public interface MerchantService {
 
   MerchantDto createMerchant(MerchantDto merchantDto);

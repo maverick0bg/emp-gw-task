@@ -12,6 +12,12 @@ import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Authorize transaction service. Implements the specific logic for Authorize transactions.
+ *
+ * <p>Authorize transaction - has amount and used to hold customer's amount.
+ * Authorize Transaction can be referenced from Charge Transaction or Reversal Transaction.</p>
+ */
 @Service(value = TransactionServiceFactory.AUTHORISE)
 @RequiredArgsConstructor
 public class AuthorizeTransactionServiceImpl extends AbstractTransactionService {

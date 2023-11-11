@@ -5,6 +5,7 @@ import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/** Enum for transaction statuses. Enumerate possible statuses for a transaction. */
 @RequiredArgsConstructor
 @Getter
 public enum TransactionStatuses {

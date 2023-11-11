@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Transaction controller.
+ * Provides an endpoints for creating different types of transactions.
+ */
 @RestController
 @RequestMapping(
     value = "/transaction",

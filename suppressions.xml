@@ -6,7 +6,4 @@
 <suppressions>
     <!-- Hope, that every method contains self-explanation code -->
     <suppress checks="MissingJavadocMethod" files=".*\.java"/>
-    <!-- Test classes do not require class javadoc -->
-    <suppress checks="MissingJavadocType"
-              files=".*\.java"/>
 </suppressions>

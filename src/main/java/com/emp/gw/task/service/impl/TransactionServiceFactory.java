@@ -6,7 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * Transaction service factory. This class is used to get the specific transaction service based on
+ * the transaction type.
+ */
 @Component
 @RequiredArgsConstructor
 public class TransactionServiceFactory {

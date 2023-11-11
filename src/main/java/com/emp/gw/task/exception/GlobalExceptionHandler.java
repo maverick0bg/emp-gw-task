@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/** Exception handler for all types of exceptions thrown in the application. */
 @Log4j2
 @RestControllerAdvice
 public class GlobalExceptionHandler {

@@ -9,6 +9,10 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
+/**
+ * Transaction entity mapper. This class is used to map transaction DTOs to transaction entities and
+ * vice versa.
+ */
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = ComponentModel.SPRING)
 public interface TransactionEntityMapper {
 

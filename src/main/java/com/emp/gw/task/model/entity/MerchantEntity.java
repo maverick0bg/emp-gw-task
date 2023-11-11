@@ -19,6 +19,10 @@ import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+/**
+ * Merchant entity. This ORM class is used to map the merchants table from the database to a Java
+ * class.
+ */
 @Getter
 @Setter
 @Builder
@@ -44,6 +48,7 @@ public class MerchantEntity implements Serializable {
   private boolean active;
   private BigDecimal totalTransactionAmount;
   private Long userId;
+
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "merchant")
   private List<TransactionEntity> transactions;
 }

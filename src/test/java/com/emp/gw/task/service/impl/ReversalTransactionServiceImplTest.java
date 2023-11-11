@@ -36,8 +36,6 @@ import org.mockito.MockitoAnnotations;
 class ReversalTransactionServiceImplTest {
   @Mock private TransactionRepository transactionRepository;
   @Mock private MerchantService merchantService;
-  @Captor private ArgumentCaptor<TransactionEntity> transactionEntityArgumentCaptor;
-
   TransactionService transactionService;
   private TransactionEntityMapper mapper;
 

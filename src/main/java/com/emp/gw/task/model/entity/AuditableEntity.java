@@ -10,6 +10,10 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+/**
+ * Base class for the entities that must be audited. This class is used to add auditing fields to
+ * the entities.
+ */
 @MappedSuperclass
 @Getter
 @Setter
@@ -20,6 +24,5 @@ public abstract class AuditableEntity {
   @Column(nullable = false, updatable = false)
   private OffsetDateTime createdDate;
 
-  @LastModifiedDate
-  private OffsetDateTime modifiedDate;
+  @LastModifiedDate private OffsetDateTime modifiedDate;
 }

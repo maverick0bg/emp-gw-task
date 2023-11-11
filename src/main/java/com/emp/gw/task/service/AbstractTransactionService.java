@@ -8,6 +8,10 @@ import com.emp.gw.task.model.entity.TransactionEntity;
 import com.emp.gw.task.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 
+/**
+ * Abstract transaction service. This class defines the common behaviour for manipulating different
+ * types of transactions.
+ */
 public abstract class AbstractTransactionService implements TransactionService {
 
   @Transactional(value = Transactional.TxType.REQUIRES_NEW)

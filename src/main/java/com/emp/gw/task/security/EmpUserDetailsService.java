@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+/** User details service implementation. Used to manipulate user entities in the database. */
 @RequiredArgsConstructor
 public class EmpUserDetailsService implements UserDetailsService {
 

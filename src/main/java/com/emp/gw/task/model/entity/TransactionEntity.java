@@ -25,6 +25,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
+/**
+ * Transaction entity. This ORM class is used to map the transactions table from the database to a
+ * Java class.
+ */
 @Valid
 @Entity(name = "transactions")
 @Getter

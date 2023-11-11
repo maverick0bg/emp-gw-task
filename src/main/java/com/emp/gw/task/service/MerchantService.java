@@ -22,4 +22,6 @@ public interface MerchantService {
   void addAmountToMerchantBalance(Long id, BigDecimal amount);
 
   void deleteMerchant(Long merchantId);
+
+  void subtractAmountFromMerchantBalance(Long id, BigDecimal amount);
 }

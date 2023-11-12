@@ -94,6 +94,11 @@ public class MerchantServiceImpl implements MerchantService {
     merchantRepository.save(merchant);
   }
 
+  @Override
+  public Iterable<MerchantDto> findAllMerchants() {
+    return merchantRepository.findAll().stream().map(merchantMapper::toDto).toList();
+  }
+
   private MerchantEntity findMerchantEntity(Long id) {
     return merchantRepository
         .findById(id)

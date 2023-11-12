@@ -24,4 +24,6 @@ public interface MerchantService {
   void deleteMerchant(Long merchantId);
 
   void subtractAmountFromMerchantBalance(Long id, BigDecimal amount);
+
+  Iterable<MerchantDto> findAllMerchants();
 }

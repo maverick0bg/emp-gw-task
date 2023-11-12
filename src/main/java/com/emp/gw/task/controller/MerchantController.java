@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Provides an endpoint for creating, updating, deleting and retrieving merchants.
  */
 @RestController
-@RequestMapping(value = "/merchant", produces = "application/json", consumes = "application/json")
+@RequestMapping(value = "/merchants", produces = "application/json", consumes = "application/json")
 @RequiredArgsConstructor
 public class MerchantController {
 

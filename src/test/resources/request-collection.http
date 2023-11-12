@@ -4,7 +4,7 @@ Authorization: Basic merchant changeit
 
 ###
 # @name Create Merchant
-POST http://localhost:8080/merchant
+POST http://localhost:8080/merchants
 Content-Type: application/json
 Authorization: Basic merchant changeit
 X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
@@ -17,7 +17,7 @@ X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
 
 ###
 # @name Create Merchant full
-POST http://localhost:8080/merchant
+POST http://localhost:8080/merchants
 Content-Type: application/json
 Authorization: Basic merchant changeit
 X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
@@ -33,7 +33,7 @@ X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
 
 ###
 # @name Activate Merchant
-PATCH http://localhost:8080/merchant/4
+PATCH http://localhost:8080/merchants/4
 Content-Type: application/json
 Authorization: Basic merchant changeit
 X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
@@ -42,14 +42,14 @@ X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
 
 ###
 # @name Get merchant
-GET http://localhost:8080/merchant/1
+GET http://localhost:8080/merchants/1
 Content-Type: application/json
 Authorization: Basic merchant changeit
 X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
 
 ###
 # @name Delete merchant
-DELETE http://localhost:8080/merchant/3
+DELETE http://localhost:8080/merchants/3
 Content-Type: application/json
 Authorization: Basic merchant changeit
 X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
@@ -57,7 +57,7 @@ X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
 
 ###
 # @name Get all merchants
-GET http://localhost:8080/merchant
+GET http://localhost:8080/merchants
 Content-Type: application/json
 Authorization: Basic admin changeit
 X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368

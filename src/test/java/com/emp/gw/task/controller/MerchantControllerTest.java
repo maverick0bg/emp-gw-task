@@ -39,6 +39,7 @@ import org.springframework.test.web.servlet.MvcResult;
 @ContextConfiguration(classes = {TaskApplication.class})
 class MerchantControllerTest extends IntegrationTestBase {
 
+  public static final String MERCHANTS = "/merchants";
   @Autowired MockMvc mockMvc;
 
   ObjectMapper objectMapper = new ObjectMapper();
@@ -54,7 +55,7 @@ class MerchantControllerTest extends IntegrationTestBase {
             .build();
     mockMvc
         .perform(
-            post("/merchant")
+            post(MERCHANTS)
                 .with(httpBasic("admin", "admin"))
                 .with(csrf())
                 .content(objectMapper.writeValueAsString(merchantRequest))
@@ -78,7 +79,7 @@ class MerchantControllerTest extends IntegrationTestBase {
             .build();
     mockMvc
         .perform(
-            post("/merchant")
+            post(MERCHANTS)
                 .with(httpBasic("admin", "admin"))
                 .with(csrf())
                 .content(objectMapper.writeValueAsString(merchantRequest))
@@ -103,7 +104,7 @@ class MerchantControllerTest extends IntegrationTestBase {
     final MerchantDto resultMerchant = createMerchantAsAdmin("eml3@mail.com");
     mockMvc
         .perform(
-            get("/merchant/" + resultMerchant.getId())
+            get(MERCHANTS + "/" + resultMerchant.getId())
                 .with(httpBasic("user", "password"))
                 .with(csrf())
                 .with(user("user").authorities(() -> "ROLE_USER"))
@@ -123,7 +124,7 @@ class MerchantControllerTest extends IntegrationTestBase {
     MvcResult mvcResult =
         mockMvc
             .perform(
-                post("/merchant")
+                post(MERCHANTS)
                     .with(httpBasic("admin", "admin"))
                     .with(csrf())
                     .content(objectMapper.writeValueAsString(merchantRequest))
@@ -139,7 +140,7 @@ class MerchantControllerTest extends IntegrationTestBase {
     final String ktmNameUpdated = "ktm updated";
     mockMvc
         .perform(
-            patch("/merchant/" + resultMerchant.getId())
+            patch(MERCHANTS + "/" + resultMerchant.getId())
                 .with(httpBasic("admin", "admin"))
                 .with(csrf())
                 .content(
@@ -171,7 +172,7 @@ class MerchantControllerTest extends IntegrationTestBase {
     MvcResult mvcResult =
         mockMvc
             .perform(
-                post("/merchant")
+                post(MERCHANTS)
                     .with(httpBasic("admin", "admin"))
                     .with(csrf())
                     .content(objectMapper.writeValueAsString(merchantRequest))
@@ -187,7 +188,7 @@ class MerchantControllerTest extends IntegrationTestBase {
     final String ktmNameUpdated = "ktm updated";
     mockMvc
         .perform(
-            patch("/merchant/" + resultMerchant.getId())
+            patch(MERCHANTS + "/" + resultMerchant.getId())
                 .with(httpBasic("admin", "admin"))
                 .with(csrf())
                 .content(
@@ -208,7 +209,7 @@ class MerchantControllerTest extends IntegrationTestBase {
 
     mockMvc
         .perform(
-            delete("/merchant/" + resultMerchant.getId())
+            delete(MERCHANTS + "/" + resultMerchant.getId())
                 .with(httpBasic("admin", "admin"))
                 .with(csrf())
                 .contentType("application/json"))
@@ -229,7 +230,7 @@ class MerchantControllerTest extends IntegrationTestBase {
     MvcResult mvcResult =
         mockMvc
             .perform(
-                post("/merchant")
+                post(MERCHANTS)
                     .with(httpBasic("admin", "admin"))
                     .with(csrf())
                     .content(objectMapper.writeValueAsString(merchantRequest))
@@ -245,7 +246,7 @@ class MerchantControllerTest extends IntegrationTestBase {
     final String ktmNameUpdated = "ktm updated";
     mockMvc
         .perform(
-            patch("/merchant/" + resultMerchant.getId())
+            patch(MERCHANTS + "/" + resultMerchant.getId())
                 .with(httpBasic("admin", "admin"))
                 .with(csrf())
                 .content(
@@ -286,7 +287,7 @@ class MerchantControllerTest extends IntegrationTestBase {
 
     mockMvc
         .perform(
-            delete("/merchant/" + resultMerchant.getId())
+            delete(MERCHANTS + "/" + resultMerchant.getId())
                 .with(httpBasic("admin", "admin"))
                 .with(csrf())
                 .contentType("application/json"))
@@ -299,7 +300,7 @@ class MerchantControllerTest extends IntegrationTestBase {
     MvcResult mvcResult =
         mockMvc
             .perform(
-                get("/merchant/" + merchantForSearch.getId())
+                get(MERCHANTS + "/" + merchantForSearch.getId())
                     .with(httpBasic(user, password))
                     .with(csrf())
                     .with(user(user).authorities(() -> authority))
@@ -322,7 +323,7 @@ class MerchantControllerTest extends IntegrationTestBase {
     MvcResult mvcResult =
         mockMvc
             .perform(
-                post("/merchant")
+                post(MERCHANTS)
                     .with(httpBasic("admin", "admin"))
                     .with(csrf())
                     .with(user("admin").authorities(() -> "ROLE_ADMIN"))

@@ -22,6 +22,7 @@ most important technologies used for the implementation are:
 - Java 17
 - Docker (optional)
 - PostgreSQL server (optional if docker and docker-compose are used)
+- node (required for the frontend)
 
 ### Run with docker-compose
 
@@ -48,6 +49,8 @@ It will start everything needed to test the service.
 docker-compose -f docker-compose-test.yml up
 ```
 
+The service will be accessible on localhost:8080.
+
 ### Run without docker (PostgreSQL server is required)
 
 Make the necessary changes in application.properties file to point to your database server. Then
@@ -55,6 +58,20 @@ Make the necessary changes in application.properties file to point to your datab
 ```
 mvn spring-boot:run
 ```
+
+The service will be accessible on localhost:8080.
+
+### Run the frontend
+
+The frontend is implemented using React. To run the frontend you need to have node installed. Then
+go to frontend directory and run:
+
+```
+npm install
+npm run dev
+```
+
+The frontend will be accessible on localhost:3000
 
 ## What we have inside
 

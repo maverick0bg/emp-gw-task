@@ -34,6 +34,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @ContextConfiguration(classes = {TaskApplication.class})
 class TransactionControllerTest extends IntegrationTestBase {
 
+  public static final String TRANSACTIONS = "/transactions";
   @Autowired MockMvc mockMvc;
   ObjectMapper objectMapper = new ObjectMapper();
 
@@ -51,7 +52,7 @@ class TransactionControllerTest extends IntegrationTestBase {
             .build();
     mockMvc
         .perform(
-            post("/transaction")
+            post(TRANSACTIONS)
                 .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .content(objectMapper.writeValueAsString(transaction))
@@ -75,7 +76,7 @@ class TransactionControllerTest extends IntegrationTestBase {
             .build();
     mockMvc
         .perform(
-            post("/transaction")
+            post(TRANSACTIONS)
                 .with(SecurityMockMvcRequestPostProcessors.httpBasic("admin", "admin"))
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .content(objectMapper.writeValueAsString(transaction))

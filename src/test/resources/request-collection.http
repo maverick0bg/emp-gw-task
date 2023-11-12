@@ -6,12 +6,12 @@ Authorization: Basic merchant changeit
 # @name Create Merchant
 POST http://localhost:8080/merchants
 Content-Type: application/json
-Authorization: Basic merchant changeit
+Authorization: Basic admin changeit
 X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
 
 {
   "merchantName": "Merchant A",
-  "email": "memail@a.com",
+  "email": "memil@a.com",
   "description": "Merchant A Description"
 }
 
@@ -19,7 +19,7 @@ X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
 # @name Create Merchant full
 POST http://localhost:8080/merchants
 Content-Type: application/json
-Authorization: Basic merchant changeit
+Authorization: Basic admin changeit
 X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
 
 {
@@ -74,9 +74,47 @@ X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
   "customerEmail": "eml@e.com",
   "customerPhone": "1234567890",
   "merchant": {
-    "id": 3
+    "id": 1
   },
   "transactionStatus": "APPROVED",
   "transactionType": "AUTHORISE"
 }
 
+###
+# @name Create Authorize tranzaction
+POST http://localhost:8080/transaction
+Content-Type: application/json
+Authorization: Basic merchant changeit
+X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
+
+{
+"amount": 100.34,
+"customerEmail": "eml@e.com",
+"customerPhone": "1234567890",
+"merchant": {
+"id": 1
+},
+"transactionStatus": "APPROVED",
+"transactionType": "AUTHORISE"
+}
+
+###
+# @name Create related tranzaction
+POST http://localhost:8080/transaction
+Content-Type: application/json
+Authorization: Basic merchant changeit
+X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
+
+{
+  "amount": 0,
+  "customerEmail": "eml@e.com",
+  "customerPhone": "1234567890",
+  "merchant": {
+    "id": 1
+  },
+  "transactionStatus": "APPROVED",
+  "transactionType": "REVERSAL",
+  "relatedTransaction": {
+    "id": "ad83e0b9-40b8-4c75-8310-2e94596f9b39"
+  }
+}

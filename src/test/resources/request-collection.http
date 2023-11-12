@@ -56,6 +56,13 @@ X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
 
 
 ###
+# @name Get all merchants
+GET http://localhost:8080/merchant
+Content-Type: application/json
+Authorization: Basic admin changeit
+X-XSRF-TOKEN: ae9a0bda-5fe0-4d71-9a13-2d1b4fffc368
+
+###
 # @name Create Authorize tranzaction
 POST http://localhost:8080/transaction
 Content-Type: application/json

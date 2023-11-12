@@ -59,4 +59,11 @@ public class MerchantController {
   public void deleteMerchant(@PathVariable("merchantId") @NotNull Long merchantId) {
     merchantService.deleteMerchant(merchantId);
   }
+
+  @GetMapping
+  @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
+  public Iterable<MerchantDto> getAllMerchants() {
+    return merchantService.findAllMerchants();
+  }
 }

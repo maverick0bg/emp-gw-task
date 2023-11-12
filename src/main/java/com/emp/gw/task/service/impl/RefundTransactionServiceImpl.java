@@ -13,6 +13,7 @@ import com.emp.gw.task.service.AbstractTransactionService;
 import com.emp.gw.task.service.MerchantService;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 /**
  * Refund transaction service. Implements the specific logic for Refund transactions.
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
  * <p>Refund transaction - has amount and used to refund customer's amount. Refund Transaction must
  * refer Charge Transaction. Refund transaction subtracts amount from merchant's balance.
  */
+@Service(value = TransactionServiceFactory.REFUND)
 @RequiredArgsConstructor
 public class RefundTransactionServiceImpl extends AbstractTransactionService {
 

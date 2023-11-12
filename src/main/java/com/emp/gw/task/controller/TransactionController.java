@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(
-    value = "/transaction",
+    value = "/transactions",
     produces = "application/json",
     consumes = "application/json")
 @RequiredArgsConstructor

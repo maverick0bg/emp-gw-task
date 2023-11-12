@@ -276,7 +276,7 @@ class MerchantControllerTest extends IntegrationTestBase {
             .build();
     mockMvc
         .perform(
-            post("/transaction")
+            post("/transactions")
                 .with(httpBasic("admin", "admin"))
                 .with(csrf())
                 .content(objectMapper.writeValueAsString(transaction))

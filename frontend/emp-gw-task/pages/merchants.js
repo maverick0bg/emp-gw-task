@@ -1,4 +1,5 @@
 import Layout from "../components/layout";
+import {Suspense} from "react";
 
 export default function Merchants({merchantsData}) {
   return (
@@ -23,8 +24,8 @@ export async function getStaticProps() {
   const merchantsData = await fetch('http://localhost:8080/merchants', {
     method: 'GET',
     headers: headers
-  }).then(response => response.json());
-
+  }).then(response => response.json()).catch(error => {console.log(error);
+    return []});
 
   console.log(merchantsData)
   // The value of the `props` key will be
@@ -47,19 +48,21 @@ function MerchantTable({merchants}) {
     );
   });
   return (
-      <table>
-        <thead>
-        <tr>
-          <th>Id</th>
-          <th>Name</th>
-          <th>Description</th>
-          <th>e-mail</th>
-          <th>Active</th>
-          <th>Total Amount</th>
-        </tr>
-        </thead>
-        <tbody>{rows}</tbody>
-      </table>
+      <Suspense fallback={<div>Loading...</div>}>
+        <table>
+          <thead>
+          <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>e-mail</th>
+            <th>Active</th>
+            <th>Total Amount</th>
+          </tr>
+          </thead>
+          <tbody>{rows}</tbody>
+        </table>
+      </Suspense>
 
   );
 }
